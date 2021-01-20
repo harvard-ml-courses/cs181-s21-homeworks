@@ -14,7 +14,7 @@
 \duedate{Never}
 
 \usepackage{hyperref}
-\usepackage{url, enumitem}
+\usepackage{url}
 \usepackage{amsfonts, amsmath, amsthm}
 \usepackage{listings}
 \usepackage[shortlabels]{enumitem}
@@ -60,7 +60,7 @@
 		        \mathbf{X} = \begin{pmatrix}
 		        x_{11} & x_{12}\\
 		        x_{21} & x_{22}
-		        \end{pmatrix} \hspace{10} \mathbf{y} = \begin{pmatrix} y_{1} \\ y_{2} \end{pmatrix} \hspace{10} \mathbf{z} = \begin{pmatrix} z_{1} \\ z_{2} \end{pmatrix} \hspace{10} 
+		        \end{pmatrix} \hspace{10pt} \mathbf{y} = \begin{pmatrix} y_{1} \\ y_{2} \end{pmatrix} \hspace{10pt} \mathbf{z} = \begin{pmatrix} z_{1} \\ z_{2} \end{pmatrix} \hspace{10pt} 
 		    \end{equation}  
 		    \begin{enumerate}[label=(\alph*)]
 		        \item Expand $\mathbf{X}\mathbf{y} + \mathbf{z}$ 
@@ -68,7 +68,6 @@
 		        \item Expand $\mathbf{y^T}\mathbf{X}\mathbf{y}$
 
 		    \end{enumerate}
-		\\
 		\textbf{Solution:} 
 		\begin{enumerate}[label=(\alph*)]
 		        \item 
@@ -119,7 +118,7 @@ Assume matrix $\mathbf{X}$ has dimensionality (or shape) $(n \times d)$, and vec
 		        
 		        \item Using $y$ from part (a), what shape is $(\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T y$?
 		        
-		        \item Assume matrix $\mathbf{X}' = \mathbf{X}^T$, and vector $\mathbf{w}' = \mathbf{w}^T$.  What shape is $\mathbf{y}' = \mathbf{w}'^T \mathbf{X}'$?  
+		        \item Assume vector $\mathbf{w}' = \mathbf{w}^T$.  What shape is $\mathbf{y}' = \mathbf{X}\mathbf{w}'^T $?  
 
 		    \end{enumerate}
 
@@ -128,7 +127,7 @@ Assume matrix $\mathbf{X}$ has dimensionality (or shape) $(n \times d)$, and vec
     \item $(n \times 1)$
     \item $\mathbf{X}^T\mathbf{X}$ has shape $(d \times d)$ and so $(\mathbf{X}^T\mathbf{X})^{-1}$ has shape $(d \times d)$
     \item $\mathbf{X}^T \mathbf{y}$ has shape $(d \times 1)$ and so $(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T \mathbf{y}$ has shape $(d \times 1)$
-    \item Transposing a matrix twice returns the original matrix so we have $\mathbf{y}' = \mathbf{w} \mathbf X^T$, which has shape $(1 \times n)$
+    \item Transposing a matrix twice returns the original matrix so we have $\mathbf{y}' = \mathbf X \mathbf{w}$, which has shape $(n  \times 1)$
 \end{enumerate}
 \end{problem}
 
@@ -171,12 +170,12 @@ Assume matrix $\mathbf{X}$ has dimensionality (or shape) $(n \times d)$, and vec
         
 
 \begin{problem} 
-		       Solve the following vector/matrix calculus problems. In all of the below, $\mathbf{x}$ and $\mathbf{w}$ are column vectors (i.e. $d \times 1$ vectors).  It may be helpful to refer to \href{https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf}{\emph{The Matrix Cookbook}} by Petersen and Pedersen, specifically sections 2.4, 2.6, and 2.7.
+		       Solve the following vector/matrix calculus problems. In all of the below, $\mathbf{x}$ and $\mathbf{w}$ are column vectors (i.e. $n \times 1$ vectors).  It may be helpful to refer to \href{https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf}{\emph{The Matrix Cookbook}} by Petersen and Pedersen, specifically sections 2.4, 2.6, and 2.7.
 		    
 		    \begin{enumerate} [label=(\alph*)]
 		        \item Let $f(\mathbf{x}) = \mathbf{x}^T \mathbf{x}$. Find $\nabla_{\mathbf{x}} f(\mathbf{x}) = \frac{\delta}{\delta \mathbf{x}} f(\mathbf{x})$.
 		        
-		        \emph{Hint}: As a first step, you can expand $\mathbf{x}^T \mathbf{x} = (x_1^2 + x_2^2 + ... + x_d^2)$, where $\mathbf{x} = (x_1, ..., x_d)$. 
+		        \emph{Hint}: As a first step, you can expand $\mathbf{x}^T \mathbf{x} = (x_1^2 + x_2^2 + ... + x_n^2)$, where $\mathbf{x} = (x_1, ..., x_n)$. 
 		        
 		        \item Let $f(\mathbf{w}) = (1 - \mathbf{w}^T \mathbf{x})^2$. Find $\nabla_{\mathbf{w}} f(\mathbf{w}) = \frac{\delta}{\delta \mathbf{w}} f(\mathbf{w})$.
 		        
@@ -195,19 +194,26 @@ Assume matrix $\mathbf{X}$ has dimensionality (or shape) $(n \times d)$, and vec
 		        \end{align*}
 		        
 		        \item By the chain rule: \begin{align*}
-		            \nabla 
-		            (1 - \mathbf{w}^T\mathbf{x})^2 &= 2(1 - \mathbf{w}^T\mathbf{x})\mathbf{x}\\
+		            \frac{\partial f}{\partial \mathbf{w}} &= 2(1-\mathbf{w}^T\mathbf{x}) \frac{\partial}{\partial \mathbf{w}} (1-\mathbf{w}^T\mathbf{x}) \\
+		            &= -2(1-\mathbf{w}^T\mathbf{x})\mathbf{x}
 		        \end{align*}
 		        
-		        \item The partial with respect to $x_i$ is: \begin{align*}
-		            \frac{\partial}{\partial x_i} x^TAx &= \frac{\partial}{\partial x_i} \sum_{j=1}^n \sum_{k=1}^n a_{jk} x_i x_j \\
+		        \item The partial of $\mathbf{x^TAx}$ with respect to $x_i$ is: \begin{align*}
+		            \frac{\partial}{\partial x_i} \mathbf{x^TAx} &= \frac{\partial}{\partial x_i} \sum_{j=1}^n \sum_{k=1}^n a_{jk} x_i x_j \\
 		            &= \sum_{k\neq i}a_{ik} x_k +  \sum_{j\neq i}a_{ji}x_j + 2a_{ii}x_i \\ 
 		            &= \sum_{k=1}^n a_{ik} x_k + \sum_{j=1}^n a_{ji} x_j \\
-		            &= \sum_{k=1}^n a_{ik} x_k + \sum_{k=1}^n a_{ik} x_k \hspace{5} \text{since $A$ is symmetric}\\
+		            &= \sum_{k=1}^n a_{ik} x_k + \sum_{k=1}^n a_{ik} x_k \hspace{5pt} \text{since $A$ is symmetric}\\
 		            &= 2\sum_{k=1}^n a_{ik} x_k
 		        \end{align*}
 		        
-		        This is the $i$th row that results from multiplying $2Ax$. Thus the answer is $2Ax$.
+		        This is the $i$th row that results from multiplying $2Ax$. Thus $\frac{\partial}{\partial \mathbf{x}} \mathbf{x^TAx}$ is $2Ax$.
+		        
+		        Since $\frac{\partial}{\partial \mathbf{x}}\mathbf{w^Tx}$ is $\mathbf{w}$, the total answer is:
+		        
+		        \begin{equation}
+		            2\mathbf{A}\mathbf{x} + \mathbf{w}
+		        \end{equation}
+		       
 		    \end{enumerate}
  		    
 		\end{problem}
@@ -297,7 +303,7 @@ For the variance, we use LOTUS:
 \begin{align*}
     Var(X) &= E(X^2) - (EX)^2 = E(X^2) \\
     &= \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} x^2e^{-\frac{x^2}{2}} \\
-        &= \frac{2}{\sqrt{2\pi}} \int_{0}^{\infty} x^2e^{-\frac{x^2}{2}} \hspace{5} \text{since $x^2e^{-x^2/2}$ is an even function}\\
+        &= \frac{2}{\sqrt{2\pi}} \int_{0}^{\infty} x^2e^{-\frac{x^2}{2}} \hspace{5pt} \text{since $x^2e^{-x^2/2}$ is an even function}\\
 \end{align*}
 Now use integration by parts with $u = x$ and $dv = xe^{-x^2/2}dx$, so $du = dx$ and $v = -e^{-x^2/2}$:
 \begin{align*}
