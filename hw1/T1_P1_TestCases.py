@@ -30,17 +30,17 @@ testloss1 = 0.5979878781744292
 testloss2 = 2.059976079470737
 testloss3 = 0.36754440076084405
 
-case1_checker = np.array_equal(np.around(testloss1,2),np.around(compute_loss(W_test1),2))
+case1_checker = np.abs(testloss1 - compute_loss(W_test1)) < 0.001
 if case1_checker:
     case1_checker = "Pass"
 else:
     case1_checker = "Fail"
-case2_checker = np.array_equal(np.around(testloss2,2),np.around(compute_loss(W_test2),2))
+case2_checker = np.abs(testloss2 - compute_loss(W_test2)) < 0.001
 if case2_checker:
     case2_checker = "Pass"
 else:
     case2_checker = "Fail"
-case3_checker = np.array_equal(np.around(testloss3,2),np.around(compute_loss(W_test3),2))
+case3_checker = np.abs(testloss3 - compute_loss(W_test3)) < 0.01
 if case3_checker:
     case3_checker = "Pass"
 else:

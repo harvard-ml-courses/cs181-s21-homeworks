@@ -22,7 +22,7 @@ def checker_t1_p2():
     if len(alpha_05)!=len(predict_kernel(alpha=0.5)):
         print("Your predictions for alpha = 0.5 have the wrong shape")
     else:
-        alpha05_checker = np.array_equal(np.around(alpha_05,2),np.around(predict_kernel(alpha=0.5),2))
+        alpha05_checker = np.linalg.norm(np.array(alpha_05) - np.array(predict_kernel(alpha=0.5)), ord=np.inf) < 0.001
         if alpha05_checker:
             alpha05_checker = "Pass"
         else:
@@ -31,7 +31,7 @@ def checker_t1_p2():
     if len(alpha_6)!=len(predict_kernel(alpha=6)):
         print("Your predictions for alpha = 6 have the wrong shape")
     else:
-        alpha6_checker = np.array_equal(np.around(alpha_6,2),np.around(predict_kernel(alpha=6),2))
+        alpha6_checker = np.linalg.norm(np.array(alpha_6) - np.array(predict_kernel(alpha=6)), ord=np.inf) < 0.001
         if alpha6_checker:
             alpha6_checker = "Pass"
         else:
@@ -40,7 +40,7 @@ def checker_t1_p2():
     if len(knn_2)!=len(predict_knn(2)):
         print("Your predictions for k = 2 have the wrong shape")
     else:
-        knn2_checker = np.array_equal(np.around(knn_2,2),np.around(predict_knn(2),2))
+        knn2_checker = np.linalg.norm(np.array(knn_2) - np.array(predict_knn(2)), ord=np.inf) < 0.001
         if knn2_checker:
             knn2_checker = "Pass"
         else:
@@ -49,7 +49,7 @@ def checker_t1_p2():
     if len(knn_8)!=len(predict_knn(8)):
         print("Your predictions for k = 8 have the wrong shape")
     else:
-        knn8_checker = np.array_equal(np.around(knn_8,2),np.around(predict_knn(8),2))
+        knn8_checker = np.linalg.norm(np.array(knn_8) - np.array(predict_knn(8)), ord=np.inf) < 0.001
         if knn8_checker:
             knn8_checker = "Pass"
         else:
