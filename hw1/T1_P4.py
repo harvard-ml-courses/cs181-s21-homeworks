@@ -65,7 +65,7 @@ Y = republican_counts
 
 # Find the regression weights using the Moore-Penrose pseudoinverse.
 def find_weights(X,Y):
-    w = np.linalg.solve(np.dot(X.T, X) , np.dot(X.T, Y))
+    w = np.dot(np.linalg.pinv(np.dot(X.T, X)), np.dot(X.T, Y))
     return w
 
 # Compute the regression line on a grid of inputs.
