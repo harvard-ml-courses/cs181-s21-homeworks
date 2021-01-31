@@ -61,7 +61,7 @@ X = np.vstack((np.ones(years.shape), years)).T
 # years; if so, is_years should be True, and if the input varible is sunspots, is_years
 # should be false
 def make_basis(xx,part='a',is_years):
-#DO NOT CHANGE LINES 62-66
+#DO NOT CHANGE LINES 65-69
     if part == 'a' and is_years:
         xx = (xx - np.array([1960]*len(xx)))/40
         
