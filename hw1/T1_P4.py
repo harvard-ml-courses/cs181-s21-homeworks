@@ -57,7 +57,18 @@ X = np.vstack((np.ones(years.shape), years)).T
 # Based on the letter input for part ('a','b','c','d'), output numpy arrays for the bases.
 # The shape of arrays you return should be: (a) 24x6, (b) 24x12, (c) 24x6, (c) 24x26
 # xx is the input of years (or any variable you want to turn into the appropriate basis).
-def make_basis(xx,part='a'):
+# is_years is a Boolean variable which indicates whether or not the input variable is
+# years; if so, is_years should be True, and if the input varible is sunspots, is_years
+# should be false
+def make_basis(xx,part='a',is_years):
+#DO NOT CHANGE LINES 62-66
+    if part == 'a' and is_years:
+        xx = (xx - np.array([1960]*len(xx)))/40
+        
+    if part == "a" and not is_years:
+        xx = xx/20
+        
+        
     return None
 
 # Nothing fancy for outputs.
