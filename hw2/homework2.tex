@@ -90,18 +90,18 @@ Please submit your \textbf{\LaTeX\ file and code files to the Gradescope assignm
 
   Consider the true data generating process $y \sim \text{Bern}(f(x)), f(x) = \sigma(\sin x)$, where $\sigma(z)$ is the sigmoid function
   $\sigma(z)= (1+\exp[-z])^{-1}$, $x \in \mathbb{R}$, and $y \in \{0,1\}$.
-  Recall that for a given $x$, Bias and Variance are defined in terms of expectations \textit{over randomly drawn datasets} $D$
+  Recall that for a given $x$, bias and variance are defined in terms of expectations \textit{over randomly drawn datasets} $D$
   from this underlying data distribution:
   \begin{align*}
   \text{Bias}[\hat{f}(x)] &= \mathbb{E}_D[\hat{f}(x)] - f(x)\\
   \text{Variance}[\hat{f}(x)] &= \mathbb{E}_D[(\hat{f}(x) - \mathbb{E}_D[\hat{f}(x)])^2]
   \end{align*}
   Here, $\hat{f}(x)$ is our estimator (learned through logistic regression on a given dataset $D$).
-  We will directly explore the Bias-Variance trade-off by drawing multiple such datasets and fitting different logistic regression models to each.
-  Remember that we, the modelers, do not usually the true data distribution.
+  We will directly explore the bias-variance trade-off by drawing multiple such datasets and fitting different logistic regression models to each.
+  Remember that we, the modelers, do not usually see the true data distribution.
   Knowledge of the true $f(x)$ is only exposed in this problem to 1) make possible the simulation
   of drawing multiple datasets, and 2) to serve as a pedagogical tool in allowing
-  verification of the true Bias.
+  verification of the true bias.
 
 \begin{enumerate}
 
@@ -136,7 +136,7 @@ How do the fits of the individual and mean prediction functions change?
 Keeping in mind that none of the model classes match the true generating process exactly, discuss the extent to which each of the bases approximates the true process.
 
 \item If we were to increase the size of each dataset drawn from $N = 10$ to a larger number, how would the variance change? Why might this be the case?
-  
+
 \end{enumerate}
 
 \end{problem}
@@ -175,7 +175,7 @@ Lagrange multipliers below, give the
     For the remaining questions, let the
     class-conditional probabilities be Gaussian distributions with
 the same covariance matrix
-    $$p(\boldx | \boldy = C_k) = \mathcal{N}(\boldx |  \bmu_k, \bSigma), \text{\ for\ }k \in \{1,\ldots, K\}$$ 
+    $$p(\boldx | \boldy = C_k) = \mathcal{N}(\boldx |  \bmu_k, \bSigma), \text{\ for\ }k \in \{1,\ldots, K\}$$
     and different means $\bmu_k$ for each class.
 
     \begin{enumerate}
@@ -284,7 +284,7 @@ After implementing the above classifiers, complete the following exercises:
       ``Number of Iterations" on the x-axis and ``Negative Log-Likelihood Loss" on the y-axis for several
       configurations of the hyperparameters $\eta$ and $\lambda$.  Specifically,  try the values $0.05$,  $0.01$,  and $0.001$ for each hyperparameter.  Limit the number of gradient descent iterations to 200,000.  What are your final choices of learning rate
       ($\eta$) and regularization strength ($\lambda$), and why are they reasonable? How
-      does altering these hyperparameters affect the ability to converge,  the rate of convergence,  and the final loss (a qualitative description is sufficient)? You only need to submit one plot for your final choices of hyperparameters. 
+      does altering these hyperparameters affect the ability to converge,  the rate of convergence,  and the final loss (a qualitative description is sufficient)? You only need to submit one plot for your final choices of hyperparameters.
 
     \item For both Gaussian generative models, report the negative log-likelihood loss. Which model has a lower loss, and why?
       For the separate covariance model, be sure to use
@@ -328,7 +328,7 @@ values in \texttt{T2\_P3.py} for logistic regression.
 Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
 
 \subsection*{Calibration}
-Approximately how long did this homework take you to complete (in hours)? 
+Approximately how long did this homework take you to complete (in hours)?
 
 
 
