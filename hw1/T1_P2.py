@@ -25,15 +25,41 @@ y = y_df.values
 print("y is:")
 print(y)
 
+W = np.array([[1., 0.], [0., 1.]])
+
+def weighted_dist(xi, xj, W):
+    diff = xi - xj
+    dist = np.dot(np.dot(diff.T, W), diff)
+    return dist
+
 def predict_kernel(alpha=0.1):
     """Returns predictions using kernel-based predictor with the specified alpha."""
-    # TODO: your code here
-    return y_df
+    preds = []
+    for i, xi in enumerate(X):
+        sum1 = 0
+        sum2 = 0
+        for j, xj in enumerate(X):
+            if (xj == xi).all():
+                continue
+            kernel = math.exp(-1 * weighted_dist(xi, xj, alpha * W))
+            sum1 += kernel * y[j]
+            sum2 += kernel
+        preds.append(sum1 / sum2)
+    return preds
 
 def predict_knn(k=1):
     """Returns predictions using KNN predictor with the specified k."""
-    # TODO: your code here
-    return y_df
+    preds = []
+    for i, xi in enumerate(X):
+        dists = [] # elements will have form (dist, y_val)
+        for j, xj in enumerate(X):
+            if (xj == xi).all():
+                continue
+            dists.append((weighted_dist(xi, xj, W), y[j]))
+        k_nearest = sorted(dists, key=lambda tup: tup[0])[:k]
+        ys = [y_val for dist, y_val in k_nearest]
+        preds.append(np.mean(ys))
+    return preds
 
 def plot_kernel_preds(alpha):
     title = 'Kernel Predictions with alpha = ' + str(alpha)
@@ -53,10 +79,10 @@ def plot_kernel_preds(alpha):
     plt.scatter(df['x1'], df['x2'], c=y_pred, cmap='gray', vmin=0, vmax = 1, edgecolors='b')
     for x_1, x_2, y_ in zip(df['x1'].values, df['x2'].values, y_pred):
         plt.annotate(str(round(y_, 2)),
-                     (x_1, x_2), 
+                     (x_1, x_2),
                      textcoords='offset points',
                      xytext=(0,5),
-                     ha='center') 
+                     ha='center')
 
     # Saving the image to a file, and showing it as well
     plt.savefig('alpha' + str(alpha) + '.png')
@@ -80,18 +106,16 @@ def plot_knn_preds(k):
     plt.scatter(df['x1'], df['x2'], c=y_pred, cmap='gray', vmin=0, vmax = 1, edgecolors='b')
     for x_1, x_2, y_ in zip(df['x1'].values, df['x2'].values, y_pred):
         plt.annotate(str(round(y_, 2)),
-                     (x_1, x_2), 
+                     (x_1, x_2),
                      textcoords='offset points',
                      xytext=(0,5),
-                     ha='center') 
+                     ha='center')
     # Saving the image to a file, and showing it as well
     plt.savefig('k' + str(k) + '.png')
     plt.show()
 
 for alpha in (0.1, 3, 10):
-    # TODO: Print the loss for each chart.
     plot_kernel_preds(alpha)
 
 for k in (1, 5, len(X)-1):
-    # TODO: Print the loss for each chart.
     plot_knn_preds(k)

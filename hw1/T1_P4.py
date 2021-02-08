@@ -7,6 +7,7 @@
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 csv_filename = 'data/year-sunspots-republicans.csv'
 years  = []
@@ -61,15 +62,22 @@ X = np.vstack((np.ones(years.shape), years)).T
 # years; if so, is_years should be True, and if the input varible is sunspots, is_years
 # should be false
 def make_basis(xx,part='a',is_years=True):
-#DO NOT CHANGE LINES 65-69
-    if part == 'a' and is_years:
-        xx = (xx - np.array([1960]*len(xx)))/40
-        
-    if part == "a" and not is_years:
-        xx = xx/20
-        
-        
-    return None
+    X = np.ones(xx.shape) # initialize matrix we're building with ones for bias term
+    if part == 'a':
+        xx = (xx - np.array([1960]*len(xx)))/40 if is_years else xx/20
+        for i in range(1, 6):
+            X = np.vstack((X, np.power(xx, i)))
+        return X.T
+    if part == 'b':
+        if not is_years:
+            return None
+        for y in range(1960, 2010, 5):
+            X = np.vstack((X, np.exp(-((xx - y) ** 2 / 25))))
+        return X.T
+    stop = 6 if part == 'c' else 26
+    for i in range(1, stop):
+        X = np.vstack((X, np.cos(xx / i)))
+    return X.T
 
 # Nothing fancy for outputs.
 Y = republican_counts
@@ -79,17 +87,29 @@ def find_weights(X,Y):
     w = np.dot(np.linalg.pinv(np.dot(X.T, X)), np.dot(X.T, Y))
     return w
 
-# Compute the regression line on a grid of inputs.
-# DO NOT CHANGE grid_years!!!!!
-grid_years = np.linspace(1960, 2005, 200)
-grid_X = np.vstack((np.ones(grid_years.shape), grid_years))
-grid_Yhat  = np.dot(grid_X.T, w)
+# Plot the data and the regression lines for each basis on a grid of inputs
+for is_years in [True, False]:
+    if is_years:
+        xlabel = "Year"
+        orig_X = years
+        orig_grid_X = np.linspace(1960, 2005, 200)
+    else:
+        xlabel = "Number of Sunspots"
+        orig_X = sunspot_counts[years<last_year]
+        orig_grid_X = np.linspace(10, 155, 200)
+        Y = republican_counts[years<last_year]
+    print(xlabel)
+    for part in ['a', 'b', 'c', 'd']:
+        if not is_years and part == 'b':
+            continue
+        X = make_basis(orig_X, part, is_years) # get basis transformations for actual data
+        Yhat = np.dot(X, find_weights(X, Y)) # get predictions and calculate loss
+        print('L2:', sum((Y - Yhat) ** 2))
 
-# TODO: plot and report sum of squared error for each basis
+        grid_X = make_basis(orig_grid_X, part, is_years) # get basis transformations for grid data
+        grid_Yhat = np.dot(grid_X, find_weights(X, Y)) # get predictions and plot
 
-# Plot the data and the regression line.
-plt.plot(years, republican_counts, 'o', grid_years, grid_Yhat, '-')
-plt.xlabel("Year")
-plt.ylabel("Number of Republicans in Congress")
-plt.show()
-
+        plt.plot(orig_X, Y, 'o', orig_grid_X, grid_Yhat, '-')
+        plt.xlabel(xlabel)
+        plt.ylabel("Republicans in Congress")
+        plt.show()
