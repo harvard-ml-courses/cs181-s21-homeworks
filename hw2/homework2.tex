@@ -118,11 +118,7 @@ Please submit your \textbf{\LaTeX\ file and code files to the Gradescope assignm
    capturing the bias-variance trade-off, so don't worry about attaining perfect precision in the gradient descent
    as long as this trade-off is captured in the final models.
 
-   Note: $\log(0)$ is undefined and may cause issues in your implementation.
-   To address these issues, we recommend adding a small constant epsilon
-   (such as $\epsilon = $ 1e-7) whenever taking a log. For example,
-   $\log(x) \rightarrow \log(x + \epsilon)$.
-   Separately, overflow RuntimeWarnings due to np.exp should be safe to ignore.
+   Note: Overflow RuntimeWarnings due to np.exp should be safe to ignore, if any.
 
 \item Create three plots, one for each basis. Starter code is available which you may modify.
 By default, each plot displays three types of functions:
