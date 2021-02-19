@@ -1,0 +1,234 @@
+\documentclass[submit]{harvardml}
+
+\course{CS181-S21}
+\assignment{Assignment \#3}
+\duedate{7:59pm EST, March 5, 2021}
+
+\usepackage[OT1]{fontenc}
+\usepackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage[pdftex]{graphicx}
+\usepackage{subfig}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{todonotes}
+\usepackage{listings}
+\usepackage{common}
+\usepackage{enumitem}
+\usepackage{bm}
+\newcommand{\B}{\text{B}}
+\newcommand{\Beta}{\text{Beta}}
+
+\usepackage[mmddyyyy,hhmmss]{datetime}
+
+\definecolor{verbgray}{gray}{0.9}
+
+\lstnewenvironment{csv}{%
+  \lstset{backgroundcolor=\color{verbgray},
+  frame=single,
+  framerule=0pt,
+  basicstyle=\ttfamily,
+  columns=fullflexible}}{}
+
+\begin{document}
+
+\begin{center}
+{\Large Homework 3: Bayesian Methods and Neural Networks}\\
+\end{center}
+
+\subsection*{Introduction}
+
+This homework is about Bayesian methods and Neural Networks.  Section 2.9 in the textbook as well as reviewing MLE and MAP will be useful for Q1. Chapter 4 in the textbook will be useful for Q2.
+
+Please type your solutions after the corresponding problems using this
+\LaTeX\ template, and start each problem on a new page.
+
+Please submit the \textbf{writeup PDF to the Gradescope assignment `HW3'}. Remember to assign pages for each question.  \textbf{All plots you submit must be included in your writeup PDF.  }We will not be checking your code / source files except in special circumstances. 
+
+Please submit your \textbf{\LaTeX file and code files to the Gradescope assignment `HW3 - Supplemental'}. 
+
+
+\begin{problem}[Bayesian Methods]
+
+  This question helps to build your understanding of making
+  predictions with a maximum-likelihood estimation (MLE), a maximum a
+  posterior estimator (MAP), and a full posterior predictive.
+
+  Consider a scalar variable $x$ with the following generative
+  process: First, the mean $\mu$ is sampled from a prior
+  $N(0,\tau^2)$.  Next, each $x_n$ is generated as $x_n = \mu +
+  \epsilon_n$, where $\epsilon_n \sim N(0,\sigma^2)$. All
+  $\epsilon_n$'s are independent of each other and of $\mu$.
+
+  For this problem, use $\sigma^2 = 1$ and $\tau^2 = 5$.  
+
+  Now, we see 14 independent samples of $x$ to yield data
+  $$D = 3.3, 3.5, 3.1, 1.8, 3.0, 0.74, 2.5, 2.4, 1.6, 2.1, 2.4, 1.3, 1.7, 0.19$$
+    
+  \textit{Make sure to include all required plots in your PDF.}
+
+\begin{enumerate}
+
+\item Derive the expression for $p(\mu|D)$.  Do \emph{not} plug in
+  numbers yet!
+
+  Hint: Use properties of normal-normal conjugacy to simplify your derivation.  You can also refer to \href{https://www.cs.ubc.ca/~murphyk/Papers/bayesGauss.pdf}{this paper}.
+  
+\item Now we get to our core interest: the predictive distribution of
+  a new datapoint $x^*$ given our observed data $D$, $p(x^*|D)$.
+  Write down the expression for the full posterior predictive
+  distribution: $$p(x^*|D) = \int p(x^*|\mu)p(\mu|D) d\mu$$ Interpret
+  your expression in a few words.  Do \emph{not} plug in numbers yet!
+
+  Hint: To simplify your derivation,
+  use the fact that $x = \mu + \epsilon$, and $\mu|D$ and $\epsilon$
+  are independent Gaussians whose distributions you know from above.
+  
+\item The full posterior predictive distribution had a nice analytic
+  form in this case, but in many problems, it is often difficult to
+  calculate because we need to marginalize out the parameters (here,
+  the parameter is $\mu$). We can mitigate this problem by plugging in
+  a point estimate of $\mu^*$ rather than a distribution. Derive the
+  estimates of $p(x^*|D) \approx p(x^*|\mu^*)$ for $\mu^* = \mu_{MLE}$
+  and $\mu^* = \mu_{MAP}$.  How do these expressions compare to the
+  expression for the full posterior above? Do \emph{not} plug in
+  numbers yet!
+  
+   
+\item Plot how the above 3 distributions change after each data point
+  is gathered.  You will have a total of 15 plots, starting with the
+  plot for the case with no data (they can be small, e.g. in a $3\times5$
+  grid).  The x-axis of each plot will be the $x$ value and the y-axis
+  the density.  You can make one plot for each estimator, or combine
+  all three estimators onto one plot with a different colored line for
+  each estimator.
+  
+    
+\item How do the means of the predictive distributions vary with more
+  data?  How do the variances vary?  Interpret the differences you see
+  between the three different estimators.
+  
+  \item Does the ordering of the data matter for the final predictive
+  distributions?  
+
+  \item Derive an expression for and then compute the marginal
+    likelihood of the training data $p(D)$.
+
+    Hint: You can rearrange the required integral such that it looks like an un-normalized
+    Gaussian distribution in terms of $\mu$,  and take advantage of the fact that
+    integrating over a normalized Gaussian distribution is equal to 1.
+    You will need to complete the square.
+    
+  \item Now consider an alternate model in which we were much more sure
+  about the mean: $\mu \sim N(0,\tau^2)$, where $\tau^2 = 0.1$.
+  Compute the marginal likelihood $p(D)$ for this model.  Which of the
+  two models has a higher marginal likelihood? Interpret this result.
+
+\end{enumerate}
+
+\end{problem}
+
+\subsection*{Solution:}
+
+\newpage
+\begin{problem}[Neural Net Optimization]
+
+  In this problem, we will take a closer look at how gradients are calculated for backprop with a simple multi-layer perceptron (MLP). The MLP will consist of a first fully connected layer with a sigmoid activation, followed by a one-dimensional, second fully connected layer with a sigmoid activation to get a prediction for a binary classification problem. Assume bias has not been merged. Let:
+  \begin{itemize}
+      \item $\bold{W}_1$ be the weights of the first layer, $\bold{b}_1$ be the bias of the first layer.
+      \item $\bold{W}_2$ be the weights of the second layer, $\bold{b}_2$ be the bias of the second layer.
+  \end{itemize}
+  
+  The described architecture can be written mathematically as: $$\hat{y} = \sigma(\bold{W}_2 \left[\sigma \left(\bold{W}_1 \bold{x} + \bold{b}_1\right)\right] + \bold{b}_2)$$
+  
+  where $\hat{y}$ is a scalar output of the net when passing in the single datapoint $\bold{x}$ (represented as a column vector), the additions are element-wise additions, and the sigmoid is an element-wise sigmoid.
+  
+  \begin{enumerate}
+      \item Let:
+      \begin{itemize}
+          \item $N$ be the number of datapoints we have
+          \item $M$ be the dimensionality of the data
+          \item $H$ be the size of the hidden dimension of the first layer. Here, hidden dimension is used to describe the dimension of the resulting value after going through the layer. Based on the problem description, the hidden dimension of the second layer is 1.
+      \end{itemize}
+      
+      Write out the dimensionality of each of the parameters, and of the intermediate variables:
+
+          \begin{align*}
+          \bold{a}_1 &= \bold{W}_1 \bold{x} + \bold{b}_1, 
+          &\bold{z}_1 = \sigma(\bold{a}_1) \\
+          a_2 &= \bold{W}_2 \bold{z}_1 + \bold{b}_2, 
+          &\hat{y} = z_2 = \sigma(a_2)
+          \end{align*}
+          
+      and make sure they work with the mathematical operations described above.
+      
+    \item  We will derive the gradients for each of the parameters.  The gradients can be used in gradient descent to find weights that improve our model's performance. For this question, assume there is only one datapoint $\bold{x}$, and that our loss is $L = -(y \log (\hat{y}) + (1 - y) \log (1 - \hat{y}))$. For all questions, the chain rule will be useful.
+    \begin{enumerate}
+        \item Find $\frac{\partial L}{\partial b_2}$. 
+        
+        \item Find $\frac{\partial L}{\partial W_2^h}$, where $W_2^h$ represents the $h$th element of $\bold{W}_2$.
+        
+        \item Find $\frac{\partial L}{\partial b_1^h}$, where $b_1^h$ represents the $h$th element of $\bold{b}_1$. (*Hint: Note that only the $h$th element of $\bold{a}_1$ and $\bold{z}_1$ depend on $b_1^h$ - this should help you with how to use the chain rule.)
+        
+        \item Find $\frac{\partial L}{\partial W_1^{h,m}}$, where  $W_1^{h,m}$ represents the element in row $h$, column $m$ in $\bold{W}_1$.
+    
+    \end{enumerate}
+    \end{enumerate}
+    
+    \end{problem}
+
+\subsection*{Solution:}
+
+
+
+\newpage
+
+
+\begin{problem}[Modern Deep Learning Tools: PyTorch]
+
+  As you might imagine from the previous problem, actually implementing
+  backprop by hand can be frustrating!  Fortunately, having modern
+  automatic differentiation tools means that you will rarely have to do
+  so.  In this problem, you will learn how to use PyTorch (the ML library of choice in industry and academia) and implement your own neural networks for image classification.
+  
+  To begin the assignment, \textbf{upload T3\_P3.ipynb to Google Colab}.  Write and run your code in Colab, and download your Colab notebook as an .ipynb file to submit as a supplemental file. Include your written responses, plots, and required code (as specified) in this LaTeX file.  
+  
+  If you have never used Google Colab before, see the `HW 3' Addendum Post on Ed, where the staff have compiled resources to help you get started. 
+  
+  You can use the Listings package to display code, as shown below:
+  
+  \begin{lstlisting}
+  example_array = np.array([1, 2, 3])
+  \end{lstlisting}
+  
+  \begin{enumerate}
+      \item Please answer Problem 3.1 from the Colab here.
+      \item Please answer Problem 3.2 from the Colab here.
+      \item Please answer Problem 3.3 from the Colab here.
+      \item Please answer Problem 3.4 from the Colab here.
+      \item Please answer Problem 3.5 from the Colab here.
+      \item Please answer Problem 3.6 from the Colab here.
+      \item Please answer Problem 3.7 from the Colab here.
+  \end{enumerate}
+  
+\end{problem}
+
+
+\subsection*{Solution:}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Name and Calibration
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Name}
+
+\subsection*{Collaborators and Resources}
+Whom did you work with, and did you use any resources beyond cs181-textbook and your notes?
+
+\subsection*{Calibration}
+Approximately how long did this homework take you to complete (in hours)? 
+
+
+\end{document}
