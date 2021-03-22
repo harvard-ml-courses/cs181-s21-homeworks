@@ -91,7 +91,7 @@ $p$.  Its PMF is given by $p(x_n | p_k) = (1 - p_k)^{x_n - 1} p_k$
 
 \item \textbf{Complete-Data Log Likelihood} The complete data
   $D = \{(\boldx_n, \boldz_n)\}_{n=1}^N$ includes latents $\boldz_n$. Write
-  out the complete-data negative log likelihood. Apply the ``power trick''\footnote{The ``power trick'' is used when terms in a PDF are raised to the power of indicator components of a one-hot vector.  For example, it allows us to rewrite $p(\boldz_n ;  \btheta) = \btheta_k^{z_{nk}}$.} and simplify your expression using indicator elements $z_{n k}$.
+  out the complete-data negative log likelihood. Apply the ``power trick''\footnote{The ``power trick'' is used when terms in a PDF are raised to the power of indicator components of a one-hot vector.  For example, it allows us to rewrite $p(\boldz_n ;  \btheta) = \prod_{k=1}^K \btheta_k^{z_{nk}}$.} and simplify your expression using indicator elements $z_{n k}$.
 
 \[\mcL(\btheta, \{p_k\}^K_{k=1}) =  -\ln p(D \given\btheta, \{p_k\}^K_{k=1}).\]
 
