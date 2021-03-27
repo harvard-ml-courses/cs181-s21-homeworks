@@ -62,38 +62,38 @@ Specifically, we assume that there are a set of $K$ parameters $p_k
 \in [0,1]$.  To generate each observation $n$, we first choose which
 of those $K$ parameters we will use based on the (unknown) overall
 mixing proportion over the components $\btheta \in [0,1]^K$,
-where~${\sum_{k=1}^K \theta_k=1}$.  Let the (latent) $\boldz_n$ indicate
+where~${\sum_{k=1}^K \btheta_k=1}$.  Let the (latent) $\boldz_n$ indicate
 which of the $K$ components we use to generate observation $n$.  Next
-we sample the observation $x_n$ from a geometric distribution
+we sample the observation $\boldx_n$ from a geometric distribution
 with parameter $p_{\boldz_n}$.  This process can be written as: 
 \begin{eqnarray*}
  \boldz_n &\sim& \text{Categorical}(\btheta) \\
- x_n &\sim& \text{Geometric}(p_{\boldz_n} )
+ \boldx_n &\sim& \text{Geometric}(p_{\boldz_n} )
 \end{eqnarray*}
 We encode observation $n$'s latent
 component-assignment ${\boldz_n \in
   \{0,1\}^K}$ as a one-hot vector. Element indicator variables $z_{n k}$ equal 1 if $\boldz_n$ was generated using component $k$.
 
 A geometric distribution corresponds to the number of trials
-needed to get to the first success. If success occurs with probability
-$p$, its PMF is given by $p(x_n ; p_k) = (1 - p_k)^{x_n - 1} p_k$, where $x_n \in \{1, 2, ...\}$.
+needed to get to the first success, if success occurs with probability
+$p$.  Its PMF is given by $p(x_n | p_k) = (1 - p_k)^{x_n - 1} p_k$
 
   \begin{enumerate}
 
   \item \textbf{Intractability of the Data Likelihood} We are
     generally interested in finding a set of parameters $p_k$ that
     maximize the data likelihood $\log
-    p(\{x_n\}^N_{n=1}; \btheta, \{p_k\}^K_{k = 1})$.  Expand the data
+    p(\{\boldx_n\}^N_{n=1}|\{p_k\}^K_{k = 1})$.  Expand the data
     likelihood to include the necessary sums over observations
-    $x_n$ and to marginalize out (via more sums) the latents
+    $\boldx_n$ and to marginalize out (via more sums) the latents
     $\boldz_n$.  Why is optimizing this likelihood directly
     intractable?  
 
 \item \textbf{Complete-Data Log Likelihood} The complete data
-  $D = \{(x_n, \boldz_n)\}_{n=1}^N$ includes latents $\boldz_n$. Write
-  out the complete-data negative log likelihood. Apply the ``power trick''\footnote{The ``power trick'' is used when terms in a PDF are raised to the power of indicator components of a one-hot vector.  For example, it allows us to rewrite $p(\boldz_n ;  \btheta) = \prod_k \theta_k^{z_{nk}}$.} and simplify your expression using indicator elements $z_{n k}$.
+  $D = \{(\boldx_n, \boldz_n)\}_{n=1}^N$ includes latents $\boldz_n$. Write
+  out the complete-data negative log likelihood. Apply the ``power trick''\footnote{The ``power trick'' is used when terms in a PDF are raised to the power of indicator components of a one-hot vector.  For example, it allows us to rewrite $p(\boldz_n ;  \btheta) = \prod_{k=1}^K \btheta_k^{z_{nk}}$.} and simplify your expression using indicator elements $z_{n k}$.
 
-\[\mcL(\btheta, \{p_k\}^K_{k=1}) =  -\ln p(D; \btheta, \{p_k\}^K_{k=1}).\]
+\[\mcL(\btheta, \{p_k\}^K_{k=1}) =  -\ln p(D \given\btheta, \{p_k\}^K_{k=1}).\]
 
 Note that optimizing
   this loss is now computationally tractable if we know $\boldz_n$.
@@ -101,13 +101,13 @@ Note that optimizing
 \item \textbf{Expectation Step} Our next step is to introduce a
   mathematical expression for $\boldq_n$, the posterior over the
   hidden topic variables~$\boldz_n$ conditioned on the observed data
-  $x_n$ with fixed parameters, i.e $\boldq_n = p(\boldz_n | x_n;
+  $\boldx_n$ with fixed parameters, i.e $\boldq_n = p(\boldz_n | \boldx_n;
   \btheta, \{ p_k \}^K_{k=1})$.
 
 \begin{itemize}
 \item  \textbf{Part 3.A } Write down and simplify the expression for $\boldq_n$.  Note that because the $\boldq_n$ represents the posterior over the hidden categorical variables $\boldz_n$, the components of vector $\boldq_n$ must sum to 1.
 
-\item  \textbf{Part 3.B } Give an algorithm for calculating the expression for $\boldq_n$ found in Part 3.A for all $n$, given the observed data~$\{x_n\}^N_{n=1}$ and settings of the parameters~$\btheta$ and~$\{ p_k\}^K_{k=1}$.
+\item  \textbf{Part 3.B } Give an algorithm for calculating the expression for $\boldq_n$ found in Part 3.A for all $n$, given the observed data~$\{\boldx_n\}^N_{n=1}$ and settings of the parameters~$\btheta$ and~$\{ p_k\}^K_{k=1}$.
 
 \end{itemize}
 
@@ -122,7 +122,7 @@ Using the~$\boldq_n$ estimates from the Expectation Step, derive an update for m
 \end{itemize}
 
 \item Suppose that this had been a classification problem. That is,
-  you were provided the ``true'' categories $\boldz_n$ for each observation $x_n$,
+  you were provided the ``true'' categories $\boldz_n$ for each observation $\boldx_n$,
   and you were going to perform the classification by
   inverting the provided generative model (i.e. now you're predicting $z$ given $x$). Could you reuse any of
   your inference derivations above?
