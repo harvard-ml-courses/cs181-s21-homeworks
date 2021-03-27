@@ -1,0 +1,213 @@
+
+\documentclass[12pt]{article}
+
+\usepackage[OT1]{fontenc}
+\usepackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{fullpage}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{todonotes}
+\usepackage{listings}
+\usepackage{soul}
+
+\usepackage[mmddyyyy,hhmmss]{datetime}
+
+\definecolor{verbgray}{gray}{0.9}
+
+\lstnewenvironment{csv}{%
+  \lstset{backgroundcolor=\color{verbgray},
+  frame=single,
+  framerule=0pt,
+  basicstyle=\ttfamily,
+  columns=fullflexible}}{}
+
+\begin{document}
+\begin{center}
+{\Large Practical 2021: Classifying Sounds}\\
+\vspace{0.25 cm} Due 7:59 PM on Friday, April 9th, 2021\\
+\end{center}
+
+\noindent This assignment must be completed in groups of 2 to 3 students. You can seek partners via Ed, and course staff will release a team-finding spreadsheet. Section \ref{section:problem-background} of this document describes the classification problem, and Section \ref{section:logistics} includes submission logistics and FAQs. In this same directory, you will find a file called \texttt{practical-template.tex}. Use it as a \LaTeX \hspace{1pt} template for your writeup, and be sure to read it for grading details.
+
+
+\section{Logistics}\label{section:logistics}
+
+\subsection{Implementation Details}
+
+You can download the train and test datasets \href{https://console.cloud.google.com/storage/browser/cs181_practical_data}{here}, and clone a starter code repository \href{https://github.com/harvard-ml-courses/cs181-s21-homeworks/tree/main/practical}{here}.  You will be required to submit all of your implementation code to Gradescope.\\
+
+\noindent This assignment can be completed on either your own computer, or on Google Colab.  We recommend that you complete the assignment using Google Colab.
+
+\begin{itemize}
+    \item If you choose to complete the assignment on your own computer, you can begin by working from the the \texttt{starter\_code.ipynb} file, which contains starter code to load the dataset. You can watch a short video walkthrough of downloading the data and running the starter code notebook \href{https://harvard.zoom.us/rec/share/cej4SbOhKoxWDXGINxjow7eGhK_UA2IW_6pxcWdnk7GjCqQDvBB0dejO1XfvdUyC.gSKJkuqNFORO8QJo}{here}.
+    \item If you choose to complete the assignment on Google Colab, begin by copying \href{https://colab.research.google.com/drive/1HO6rKLHaaFohXxPjDSaEqgwzdTaPuOBP?usp=sharing}{this Colab notebook}, which contains starter code to load the dataset.  You can watch a short video walkthrough of the Colab notebook \href{https://harvard.zoom.us/rec/share/VwVJlAqCM5zODKRDStiVwHPzVX2aduA5YQBK1AWy1oVNNL60DHYXHOUEcMk1Kdhe.ljdo3HSdxyHgg1zt}{here}.
+\end{itemize}
+
+\subsection{Submission Details}
+The main deliverable of this practical is a 3-4 page typewritten document in PDF format to Gradescope.  The document must follow the
+\texttt{practical-template.tex} file in this directory \emph{and} follow all instructions outlined in Section \ref{section:task}.  All relevant text---including your discussions of why you tried various things and why the results came out the way they did---must be included in the maximum of 4 pages.  If you need more space than 4 pages for tables, plots, or figures, that is okay.
+
+\subsection{Grading}\label{section:grading}
+
+Our grading focus will be on your ability to clearly and concisely describe what you did, present the results, and most importantly \emph{discuss} how and why different choices affected performance.  You will \emph{not} be graded on your model performance.\\
+
+\noindent Submissions that successfully and thoughtfully complete the "Your Task" sections of Parts A-C reporting results as described in Section 3.1 will receive up to 18 points (considered full credit).  Submissions that also thoughtfully explore extensions in Part D will receive up to 2 additional points, up to a total of 20 points.\\
+
+\noindent See \texttt{practical-template.tex} for our desired submission format and more tips for what a full-credit submission looks like.  All team members will receive the same practical grade.
+
+\subsection{Google Cloud}
+
+The Google Cloud Platform (GCP) offers a suite of cloud computing services.  \textbf{You do not need to set up or use GCP to complete this practical.}  Some students prefer to run code remotely on the Cloud instead of locally on their own computers for better job management. For more resources on getting started with GCP, see the Practical Addendum on Ed.
+
+
+
+\section{Problem Background}\label{section:problem-background}
+For this practical, you will classify sounds recorded using microphones around New York City into 10 classes. In making your predictions, you will primarily have at your disposal a series of amplitudes sampled for each sound. The classes of sounds under consideration in this practical are: \texttt{air\_conditioner}, \texttt{car\_horn}, \texttt{children\_playing}, \texttt{dog\_bark}, \texttt{drilling}, \texttt{engine\_idling}, \texttt{gun\_shot}, \texttt{jackhammer}, \texttt{siren}, and \texttt{street\_music}.\\ 
+
+\noindent The data source is the \href{https://urbansounddataset.weebly.com/urbansound8k.html}{UrbanSound8k dataset}, which contains labeled sound excerpts. These excerpts were created by splicing source audio recordings into shorter two-second non-overlapping clips. While multiple excerpts from the same source may be present within the train or test set, no source will have excerpts in both the train and test set.  The dataset was created by NYU's Sounds of New York City (SONYC) initiative.  For more information on how the dataset was created, you can read Sections 1 and 3 of \href{http://www.justinsalamon.com/uploads/4/3/9/4/4394963/salamon_urbansound_acmmm14.pdf}{this paper}.  
+
+\subsection{Data Files}
+There are 8 files of interest, which can be downloaded by clicking the download icon next to each file name on this \href{https://console.cloud.google.com/storage/browser/cs181_practical_data}{Google Cloud bucket}:
+\begin{itemize}
+\item \verb|Xtrain_amp.npy, ytrain_amp.npy| -- These files contain information about the 5779 sounds in the training set. The 44,100 columns of \verb|Xtrain_amp.npy| are the sampled amplitudes
+(2 seconds at 22050 samples/second). Integer labels \verb|ytrain_amp.npy| denote the class of each sound.
+
+\item \verb|Xtest_amp.npy, ytest_ampy.npy| -- These files contain information about the 1546 sounds in the test set. The 44,100 columns of \verb|Xtest_amp.npy| are the sampled amplitudes. Integer labels \verb|ytest_amp.npy| denote the class of each sound.  \textbf{Do NOT use these data for any training or parameter validation!}
+
+\item \verb|Xtrain_mel.npy, ytrain_mel.npy| -- These files contain the Mel spectrogram representation of the 5779 sounds in the training set.  Each sound has a 2D spectrogram of shape $(128 \times 87)$. In short,
+the original amplitudes are partitioned into 87 time windows,
+and there are 128 audio-related features computed for each such window. Integer labels \verb|ytrain_mel.npy| denote the class of each sound.
+
+\item \verb|Xtest_mel.npy, ytest_mel.npy| -- These files contain the Mel spectrogram representation of the 1546 sounds in the test set.  Each sound has a 2D spectrogram of shape $(128 \times 87)$.  Integer labels \verb|ytest_mel.npy| denote the class of each sound.  \textbf{Do NOT use these data for any training or parameter validation!}
+
+\end{itemize}
+
+\subsection{Class Distribution}
+The distribution of sound classes in the training data is approximately as follows. It may be worthwhile to keep in mind that some classes are very infrequent.
+
+\begin{center}
+\begin{tabular}{r c r}
+    0 &\verb|air_conditioner| & 12.6\% \\
+    1 &\verb|car_horn| & 3.54\% \\
+    2 &\verb|children_playing| & 12.53\%\\
+    3 &\verb|dog_bark| & 9.42\%\\
+    4 &\verb|drilling| & 10.93\%\\
+    5 &\verb|engine_idling| & 12.98\%    \\
+    6 &\verb|gun_shot| & 1.49\%\\
+    7 &\verb|jackhammer| & 11.85\%\\
+    8 &\verb|siren| & 12.03\%\\
+    9 &\verb|street_music| & 12.61\%
+\end{tabular}
+\end{center}
+
+\section{Your Task and Deliverables}\label{section:task}
+
+Below in Parts A-C we list three concrete explorations to complete in the context of this task.  Through this process of guided exploration, you will be expected to think critically about how you execute and iterate your approach and describe your solution.\\
+
+\noindent You are welcome to use whatever libraries, online resources, tools, and implementations that help you get the job done. Note, however, that you will be expected to \emph{understand} everything you do, even if you do not implement the low-level code yourself.  It is your responsibility to make it clear in your writeup that you did not simply download and run code.
+
+
+\subsection{Evaluation Metrics}
+In this practical, we would like you to primarily focus on optimizing for accuracy: 
+\begin{align*}
+    \text{Classification Accuracy} &= \frac{\text{Number Correctly Classified Examples}}{\text{Total Number of Examples}}.
+\end{align*}
+
+\noindent In Parts A - D, you will be asked to train several different classification models.  \textbf{For each model you train, calculate the model's train and test set overall, and per-class classification accuracy} and include these results in your write-up.\\
+
+\noindent Even better, try to run several seeds for each model in a given experiment and report mean and standard deviation of the evaluation metric. This helps you see which variability is due to chance vs. which is attributable 
+to your experimental choices.
+
+\subsection{Part A: Feature Engineering}
+
+We have provided you with two sets of data files: \texttt{amp}, which contain raw amplitude data for each of the sound recordings, and \texttt{mel}, which contain derived Mel spectrogram features for each of the sound recordings.  Here we first provide more context for each of these feature representations and then provide instructions for your deliverables.\\
+
+\noindent In this practical, our data source is recorded audio clips.  Audio data is sampled at discrete time steps.  These samples are taken at a specified rate, named the sampling frequency given in Hz.  The raw data in the \texttt{Xtrain\_amp.npy} and \texttt{Xtest\_amp.npy} files contain the sampled signal amplitudes at each timestep.  For example, the Figure \ref{fig:amplitude_plot} shows the signal amplitude versus timestep for an example file with label \texttt{children\_playing}.
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{figures/children_playing.png}
+\caption{Plot of sound amplitudes for example file with label \texttt{children\_playing}.}
+\label{fig:amplitude_plot}
+\end{figure}
+A large body of machine learning and signal processing research has explored the predictive value of various audio feature engineering techniques that take as input raw amplitude data.  Here we provide some basic intuition behind spectrogram features, which can be implemented using python package \texttt{librosa\footnote{https://librosa.org/doc/latest/index.html}}.\\ 
+
+\noindent A spectrogram is a 2D visual representation of the spectrum of frequencies of a signal as it varies with time\footnote{https://en.wikipedia.org/wiki/Spectrogram}.  There are several different kinds of spectrograms, most of which are generated by applying a Fourier transform to the sampled amplitudes\footnote{See the following optional educational resources about spectrograms if you're interested: [\href{https://www.izotope.com/en/learn/understanding-spectrograms.html}{1}, \href{https://www.princeton.edu/~cuff/ele201/files/spectrogram.pdf}{2}].}.
+Our spectrograms partition the ampltiude arrays into 87 
+sub-sequences and compute the presence of 128 different frequencies in each of these sub-sequences.\\
+
+\noindent In the practical repository, you will find the file \verb|generate_spectrograms.ipynb|. This notebook contains starter code that was used to transform raw sampled amplitdues to generate a Mel spectrogram, which is a type of short-time fourier transform with frequencies on the Mel (log) scale.  To use Mel spectrogram features, you do not need to re-run this code file, and can instead just load the saved \texttt{Xtrain\_mel.npy} and \texttt{Xtest\_mel.npy} files.\\
+ 
+\noindent \textbf{Your task: Train the following two models.}
+\begin{enumerate}
+    \item Perform PCA on the raw amplitude features (\texttt{Xtrain\_amp}, \texttt{Xtest\_amp}).  Train a logistic regression model on the  500 most significant PCA components.   
+    \item Perform PCA on the Mel spectrogram features (\texttt{Xtrain\_mel}, \texttt{Xtest\_mel}).  Train a logistic regression model on the 500 most significant PCA components.
+\end{enumerate}
+\textbf{Discuss which feature representation resulted in higher model performance, and why you hypothesize this feature representation performed better than the other.  Also discuss why we might have asked you to perform PCA first and the impact of that choice.}
+
+\subsection{Part B: Model Classes}
+
+Now, you will experiment with more expressive nonlinear model classes to maximize accuracy on the audio classification task.  Examples of nonlinear models include random forests, KNN, and neural networks.\\
+
+\noindent \textbf{Your task: Train at least one nonlinear model on a feature representation of your choice.  Compare your results to the logistic regression models in Part A and discuss what your results imply about the task.}
+
+\subsection{Part C: Hyperparameter Tuning and Validation}
+
+In this section, you will explore hyperparameter tuning.  Model hyperparameters such as network architecture or random forest maximum tree depth determine the expressivity of the model class.  Training hyperparameters such as learning rate, weight decay, or regularization coefficients influence optimization and can encourage desirable properties (such as sparsity) in the final learned models.\\
+
+\noindent Popular hyperparameter tuning techniques include random search, where you train a set of models with hyperparameters chosen uniformly at random from a set of possible values, \footnote{https://jmlr.csail.mit.edu/papers/volume13/bergstra12a/bergstra12a.pdf} and grid search, where all possible parameter values are considered exhaustively \footnote{https://scikit-learn.org/stable/modules/grid\_search.html}.\\
+
+\noindent \textbf{Your task: Perform a hyperparameter search to maximize predictive accuracy for two model classes of your choice.  You can choose which hyperparameters you search over (feel free to search over multiple simultaneously if you'd like!), but you must search over at least 5 possible values for at least 1 hyperparameter.  Explore the changes in performance as you choose different hyperparameter values. In your writeup, discuss your validation strategy and your conclusions.}\\
+
+\noindent Note: Choose how to present your results of your hyperparameter search in a way that best reflects how to communicate your conclusions.
+
+\subsection{Bonus, Part D: Explore some more!}\label{section:task-exploration}
+
+This section is not required to receive a full-credit grade of 18 points on the practical.  See Section \ref{section:grading} for more details about practical grading.
+\\
+
+\noindent \textbf{Your task: Try any combination of the suggestions below, or come up with your own ideas to improve model training or expand your evaluation!  In your write-up, discuss what you tried, what happened, and your conclusions from this exploration.}\\
+
+\noindent Some ideas:
+\begin{itemize}
+    \item \textbf{Alternative feature representations:}  Try out other popular audio feature representations like Mel-frequency cepstrum coefficients (MFCCs) \footnote{https://librosa.org/doc/main/generated/librosa.feature.mfcc.html} or others listed in librosa's documentation \footnote{https://librosa.org/doc/main/feature.html}.  You could also explore alternative dimensionality reduction techniques to use instead of PCA.
+    
+    \item \textbf{Use a CNN on the spectrogram data}: CNN architectures have been shown to achieve high classification accuracy when trained on audio spectrogram data \footnote{https://research.google/pubs/pub45611/}!
+    
+    \item \textbf{Explore other evaluation metrics}: You may also consider optimizing for or reporting other metrics e.g. precision or recall across various classes. 
+    
+    \item \textbf{Address class imbalance}: Some classes are very infrequent in the training dataset.  Popular techniques to address class imbalance are using a class-weighted loss function \footnote{https://www.kdnuggets.com/2018/12/handling-imbalanced-datasets-deep-learning.html} or by upsampling infrequent classes during training \footnote{https://towardsdatascience.com/handling-imbalanced-datasets-in-machine-learning-7a0e84220f28}.
+
+    \item \textbf{Use a generative classifier:} You could build a model for the class-conditional distribution associated with each type of sound and compute the posterior probability for prediction.  
+    
+    \item \textbf{Use a support vector machine:} If you prefer your objectives convex.
+    
+    \item \textbf{Go totally Bayesian:} Worried that you're not accounting for uncertainty?  You could take a fully Bayesian approach to classification and marginalize out your uncertainty in a generative or discriminative model.
+    
+\end{itemize}
+
+
+\subsection{Other FAQs}
+\paragraph{What language should I code in?}
+You can code in whatever language you find most productive.  We will
+provide some limited sample code in Python.  You should not view the
+provided Python code as a required framework, but as hopefully-helpful
+examples.
+
+\paragraph{Can I use \{scikit-learn $|$ pylearn $|$ torch $|$ shogun $|$ other ML library\}?}
+You can use these tools, but not blindly.  You are expected to show a
+deep understanding of the methods we study in the course, and your
+writeup will be where you demonstrate this.
+
+\paragraph{What do I submit?}
+You will submit both your write-up on Gradescope and all of your practical code to a supplemental assignment on Gradescope.
+
+\paragraph{Can I have an extension?}
+Yes, your writeup can be turned in late according to standard homework late day policy.  You can use at most two late days on the practical.
+
+
+\end{document}
