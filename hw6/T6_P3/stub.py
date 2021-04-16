@@ -3,7 +3,12 @@ import numpy as np
 import numpy.random as npr
 import pygame as pg
 
-from SwingyMonkey import SwingyMonkey
+# uncomment this for animation
+# from SwingyMonkey import SwingyMonkey
+
+# uncomment this for no animation
+from SwingyMonkeyNoAnimation import SwingyMonkey
+
 
 X_BINSIZE = 200
 Y_BINSIZE = 100

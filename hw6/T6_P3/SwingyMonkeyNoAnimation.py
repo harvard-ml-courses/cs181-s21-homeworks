@@ -1,5 +1,4 @@
-import sys
-import pygame as pg
+import matplotlib.image as mpimg
 import numpy.random as npr
 
 
@@ -62,8 +61,8 @@ class SwingyMonkey:
 
         # # Load external resources.
         # self.background_img = pg.image.load('res/jungle-pixel.bmp').convert()
-        self.monkey_img     = pg.image.load('res/monkey.bmp').convert_alpha()
-        self.tree_img       = pg.image.load('res/tree-pixel.bmp').convert_alpha()
+        self.monkey_img = mpimg.imread('res/monkey.bmp')
+        self.tree_img = mpimg.imread('res/tree-pixel.bmp')
         # if self.sound:
         #     self.screech_snd    = pg.mixer.Sound('res/screech.wav')
         #     self.blop_snd       = pg.mixer.Sound('res/blop.wav')
@@ -76,9 +75,9 @@ class SwingyMonkey:
         self.next_tree = 0
         
         # Precompute some things about the monkey.
-        self.monkey_left  = self.screen_width/2 - self.monkey_img.get_width()/2
-        self.monkey_right = self.monkey_left + self.monkey_img.get_width()
-        self.monkey_loc   = self.screen_height/2 - self.monkey_img.get_height()/2
+        self.monkey_left  = self.screen_width/2 - self.monkey_img.shape[1]/2
+        self.monkey_right = self.monkey_left + self.monkey_img.shape[1]
+        self.monkey_loc   = self.screen_height/2 - self.monkey_img.shape[0]/2
 
         # Track game state.
         self.vel   = 0
@@ -114,8 +113,8 @@ class SwingyMonkey:
                            'top': self.screen_height-next_tree['y'],
                            'bot': self.screen_height-next_tree['y']-self.tree_gap},
                  'monkey': { 'vel': self.vel,
-                             'top': self.screen_height - self.monkey_loc + self.monkey_img.get_height()/2,
-                             'bot': self.screen_height - self.monkey_loc - self.monkey_img.get_height()/2}}
+                             'top': self.screen_height - self.monkey_loc + self.monkey_img.shape[0]/2,
+                             'bot': self.screen_height - self.monkey_loc - self.monkey_img.shape[0]/2}}
 
     def game_loop(self):
         '''This is called every game tick.  You call this in a loop
@@ -125,12 +124,12 @@ class SwingyMonkey:
 
         # Render the background.
         # self.screen.blit(self.background_img, (self.iter,0))
-        # if self.iter < self.background_img.get_width() - self.screen_width:
-        #     self.screen.blit(self.background_img, (self.iter+self.background_img.get_width(),0))
+        # if self.iter < self.background_img.shape[1] - self.screen_width:
+        #     self.screen.blit(self.background_img, (self.iter+self.background_img.shape[1],0))
 
         # Perhaps generate a new tree.
         if self.next_tree <= 0:
-            self.next_tree = self.tree_img.get_width() * 5 + int(npr.geometric(1.0/self.tree_mean))
+            self.next_tree = self.tree_img.shape[1] * 5 + int(npr.geometric(1.0/self.tree_mean))
             self.trees.append( { 'x': self.screen_width+1,
                                  'y': int((0.3 + npr.rand()*0.65)*(self.screen_height-self.tree_gap)),
                                  's': False })
@@ -148,15 +147,15 @@ class SwingyMonkey:
             # self.hook = self.screen_width
 
         # Eliminate trees that have moved off the screen.
-        self.trees = [x for x in self.trees if x['x'] > -self.tree_img.get_width()]
+        self.trees = [x for x in self.trees if x['x'] > -self.tree_img.shape[1]]
 
         # Monkey dynamics
         self.monkey_loc -= self.vel
         self.vel        -= self.gravity
 
         # Current monkey bounds.
-        monkey_top = self.monkey_loc - self.monkey_img.get_height()/2
-        monkey_bot = self.monkey_loc + self.monkey_img.get_height()/2
+        monkey_top = self.monkey_loc - self.monkey_img.shape[0]/2
+        monkey_bot = self.monkey_loc + self.monkey_img.shape[0]/2
 
         # Move trees to the left, render and compute collision.
         self.next_tree -= self.horz_speed
@@ -172,14 +171,14 @@ class SwingyMonkey:
             # # Render gap in tree.
             # self.screen.blit(self.background_img, (tree['x'], tree['y']),
             #                  (tree['x']-self.iter, tree['y'],
-            #                   self.tree_img.get_width(), self.tree_gap))
-            # if self.iter < self.background_img.get_width() - self.screen_width:
+            #                   self.tree_img.shape[1], self.tree_gap))
+            # if self.iter < self.background_img.shape[1] - self.screen_width:
             #     self.screen.blit(self.background_img, (tree['x'], tree['y']),
-            #                      (tree['x']-(self.iter+self.background_img.get_width()), tree['y'],
-            #                       self.tree_img.get_width(), self.tree_gap))
+            #                      (tree['x']-(self.iter+self.background_img.shape[1]), tree['y'],
+            #                       self.tree_img.shape[1], self.tree_gap))
                 
             trunk_left  = tree['x']
-            trunk_right = tree['x'] + self.tree_img.get_width()
+            trunk_right = tree['x'] + self.tree_img.shape[1]
             trunk_top   = tree['y']
             trunk_bot   = tree['y'] + self.tree_gap
 
@@ -187,7 +186,7 @@ class SwingyMonkey:
             if (((trunk_left < (self.monkey_left+15)) and (trunk_right > (self.monkey_left+15))) or
                 ((trunk_left < self.monkey_right) and (trunk_right > self.monkey_right))):
                 #pg.draw.rect(self.screen, (255,0,0), (trunk_left, trunk_top, trunk_right-trunk_left, trunk_bot-trunk_top), 1)
-                #pg.draw.rect(self.screen, (255,0,0), (self.monkey_left+15, monkey_top, self.monkey_img.get_width()-15, monkey_bot-monkey_top), 1)
+                #pg.draw.rect(self.screen, (255,0,0), (self.monkey_left+15, monkey_top, self.monkey_img.shape[1]-15, monkey_bot-monkey_top), 1)
                 if (monkey_top < trunk_top) or (monkey_bot > trunk_bot):
                     tree_hit = True
             
@@ -256,8 +255,8 @@ class SwingyMonkey:
         # Move things.
         # self.hook -= self.horz_speed
         # self.iter -= self.horz_speed
-        # if self.iter < -self.background_img.get_width():
-        #     self.iter += self.background_img.get_width()
+        # if self.iter < -self.background_img.shape[1]:
+        #     self.iter += self.background_img.shape[1]
 
         return True
 
